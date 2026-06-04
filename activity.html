@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>活动详情 · TREESWITH</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Inter:wght@200;300;400;500&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    :root {
+      --bg:        #ffffff;
+      --bg-warm:   #f8f6f3;
+      --bg-cream:  #f3f0eb;
+      --ink:       #1c1c1c;
+      --text:      #3a3a3a;
+      --muted:     #9a9590;
+      --line:      #e5e2dc;
+      --accent:    #5c7a52;
+      --serif:     'Noto Serif SC', 'Georgia', serif;
+      --sans:      'Inter', 'Noto Sans SC', sans-serif;
+    }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.85;
+      -webkit-font-smoothing: antialiased;
+      font-weight: 300;
+    }
+    img { max-width: 100%; display: block; }
+    a { color: inherit; text-decoration: none; }
+
+    /* ===== NAV ===== */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 56px;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-logo {
+      font-family: var(--serif);
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: var(--ink);
+      letter-spacing: 0.08em;
+    }
+    .nav-back {
+      font-size: 0.72rem;
+      font-weight: 400;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+    .nav-back:hover { color: var(--ink); }
+
+    /* ===== ACTIVITY DETAIL ===== */
+    .activity-hero {
+      width: 100%;
+      height: 70vh;
+      min-height: 400px;
+      position: relative;
+      overflow: hidden;
+      margin-top: 56px;
+    }
+    .activity-hero img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .activity-hero .placeholder {
+      width: 100%; height: 100%;
+      background: var(--bg-cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--line);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+    }
+
+    .activity-body {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 72px 56px 120px;
+    }
+    .activity-date {
+      font-size: 0.62rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .activity-title {
+      font-family: var(--serif);
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.35;
+      margin-bottom: 40px;
+      letter-spacing: -0.01em;
+    }
+    .activity-text p {
+      font-size: 0.92rem;
+      color: var(--text);
+      line-height: 2.1;
+      margin-bottom: 1.2em;
+    }
+    .activity-text p:last-child { margin-bottom: 0; }
+
+    /* Activity photos */
+    .activity-photos {
+      margin-top: 64px;
+      padding-top: 64px;
+      border-top: 1px solid var(--line);
+    }
+    .activity-photos .label {
+      display: block;
+      margin-bottom: 24px;
+    }
+    .photos-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .photos-grid .photo {
+      aspect-ratio: 4/3;
+      overflow: hidden;
+      border-radius: 2px;
+      background: var(--bg-cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--line);
+      font-size: 0.65rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .photos-grid .photo:hover { opacity: 0.85; }
+    .photos-grid .photo img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .photos-grid .photo:first-child {
+      grid-column: 1 / -1;
+      aspect-ratio: 16/9;
+    }
+
+    /* Back to story link */
+    .back-link {
+      text-align: center;
+      padding: 48px 56px 80px;
+    }
+    .back-link a {
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 2px;
+      transition: color 0.3s;
+    }
+    .back-link a:hover { color: var(--ink); }
+
+    /* ===== LIGHTBOX ===== */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.97);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .lightbox.active { display: flex; }
+    .lightbox img {
+      max-width: 85vw;
+      max-height: 85vh;
+      object-fit: contain;
+      cursor: default;
+    }
+    .lb-close {
+      position: fixed;
+      top: 28px;
+      right: 36px;
+      font-size: 1.4rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color 0.2s;
+      font-weight: 200;
+    }
+    .lb-close:hover { color: var(--ink); }
+
+    @media (max-width: 900px) {
+      nav { padding: 0 24px; }
+      .activity-body { padding: 48px 24px 80px; }
+      .photos-grid { grid-template-columns: 1fr; }
+      .photos-grid .photo:first-child { aspect-ratio: 4/3; }
+      .back-link { padding: 32px 24px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<nav>
+  <a href="index.html" class="nav-logo">TREESWITH</a>
+  <a href="index.html#story" class="nav-back">&larr; Back to Story</a>
+</nav>
+
+<!-- ===== HERO IMAGE ===== -->
+<div class="activity-hero">
+  <div class="placeholder">活动封面大图 · 替换为真实照片</div>
+  <!-- <img src="images/activities/xxx.jpg" alt=""> -->
+</div>
+
+<!-- ===== BODY ===== -->
+<div class="activity-body">
+  <div class="activity-date">2024 · Autumn</div>
+  <h1 class="activity-title">活动标题</h1>
+  <div class="activity-text">
+    <p>在这里写活动的详细故事。可以是这次去了哪里、做了什么、孩子们的反应、印象深刻的小片段...</p>
+    <p>替换为真实内容。每段之间留空行。</p>
+    <p>可以写很多段，没有限制。</p>
+  </div>
+
+  <div class="activity-photos">
+    <span class="label">Photos</span>
+    <div class="photos-grid">
+      <div class="photo">📷</div>
+      <div class="photo">📷</div>
+      <div class="photo">📷</div>
+      <div class="photo">📷</div>
+      <div class="photo">📷</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== BACK ===== -->
+<div class="back-link">
+  <a href="index.html#story">返回全部故事</a>
+</div>
+
+<!-- ===== LIGHTBOX ===== -->
+<div class="lightbox" id="lightbox">
+  <span class="lb-close" onclick="closeLb()">&times;</span>
+  <img id="lb-img" src="" alt="" onclick="event.stopPropagation()" />
+</div>
+
+<script>
+  document.querySelectorAll('.photos-grid .photo img').forEach(img => {
+    img.addEventListener('click', () => {
+      document.getElementById('lb-img').src = img.src;
+      document.getElementById('lightbox').classList.add('active');
+    });
+  });
+  document.getElementById('lightbox').addEventListener('click', closeLb);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLb(); });
+  function closeLb() { document.getElementById('lightbox').classList.remove('active'); }
+
+  // Auto-update title with URL param
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id') || '';
+  if (id) document.title = '活动详情 #' + id + ' · TREESWITH';
+</script>
+</body>
+</html>

@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TREESWITH · 一段陪伴，正在生长。</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Inter:wght@200;300;400;500&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    :root {
+      --bg:        #ffffff;
+      --bg-warm:   #f8f6f3;
+      --bg-cream:  #f3f0eb;
+      --ink:       #1c1c1c;
+      --text:      #3a3a3a;
+      --muted:     #9a9590;
+      --line:      #e5e2dc;
+      --accent:    #5c7a52;
+      --serif:     'Noto Serif SC', 'Georgia', serif;
+      --sans:      'Inter', 'Noto Sans SC', sans-serif;
+    }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.85;
+      -webkit-font-smoothing: antialiased;
+      font-weight: 300;
+    }
+    img { max-width: 100%; display: block; }
+    a { color: inherit; text-decoration: none; }
+
+    /* ===== LABEL ===== */
+    .label {
+      font-size: 0.62rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    /* ===== NAV ===== */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 56px;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--line);
+      transition: all 0.4s;
+    }
+    .nav-logo {
+      font-family: var(--serif);
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: var(--ink);
+      letter-spacing: 0.08em;
+    }
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.72rem;
+      font-weight: 400;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--ink); }
+
+    /* ===== HERO ===== */
+    .hero {
+      width: 100%;
+      height: 100vh;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: var(--bg);
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+    }
+    .hero-bg img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .hero-bg .placeholder {
+      width: 100%; height: 100%;
+      background: var(--bg-cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--line);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.55);
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      padding: 0 24px;
+    }
+    .hero-logo {
+      font-family: var(--serif);
+      font-size: clamp(2.6rem, 7vw, 5rem);
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: 0.12em;
+      line-height: 1;
+      margin-bottom: 28px;
+    }
+    .hero-tagline {
+      font-size: clamp(0.9rem, 1.6vw, 1.1rem);
+      color: var(--text);
+      font-weight: 300;
+      letter-spacing: 0.16em;
+      line-height: 1.6;
+    }
+    .hero-scroll {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .hero-scroll span {
+      font-size: 0.58rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .hero-scroll-line {
+      width: 1px;
+      height: 40px;
+      background: var(--line);
+    }
+
+    /* ===== INTRO ===== */
+    .intro {
+      padding: 120px 56px;
+      max-width: 720px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .intro p {
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 2.2;
+      font-weight: 300;
+      margin-bottom: 1.2em;
+    }
+    .intro p:last-child { margin-bottom: 0; }
+
+    /* ===== DIVIDER ===== */
+    .divider {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 56px;
+    }
+    .divider-line {
+      height: 1px;
+      background: var(--line);
+    }
+
+    /* ===== SECTION WRAP ===== */
+    .section-wrap {
+      padding: 96px 56px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* ===== STORY ===== */
+    #story { background: var(--bg); }
+    .story-header {
+      margin-bottom: 64px;
+    }
+    .story-header .label {
+      display: block;
+      margin-bottom: 14px;
+    }
+    .story-header h2 {
+      font-family: var(--serif);
+      font-size: clamp(1.5rem, 2.8vw, 2rem);
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.4;
+      margin-bottom: 18px;
+    }
+    .story-header p {
+      font-size: 0.92rem;
+      color: var(--muted);
+      max-width: 540px;
+      line-height: 2;
+    }
+
+    /* Story paragraph block */
+    .story-opening {
+      max-width: 680px;
+      margin-bottom: 72px;
+      padding-bottom: 72px;
+      border-bottom: 1px solid var(--line);
+    }
+    .story-opening p {
+      font-size: 0.92rem;
+      color: var(--text);
+      line-height: 2.1;
+      font-weight: 300;
+      margin-bottom: 1.1em;
+    }
+    .story-opening p:last-child { margin-bottom: 0; }
+
+    /* Card waterfall */
+    .card-grid {
+      display: columns;
+      columns: 2;
+      column-gap: 32px;
+    }
+    .card {
+      break-inside: avoid;
+      margin-bottom: 32px;
+      cursor: pointer;
+      transition: opacity 0.25s;
+      display: inline-block;
+      width: 100%;
+    }
+    .card:hover { opacity: 0.88; }
+    .card-img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      overflow: hidden;
+      border-radius: 2px;
+      margin-bottom: 14px;
+      background: var(--bg-cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--line);
+      font-size: 0.65rem;
+    }
+    /* vary some card heights for waterfall effect */
+    .card:nth-child(3n+1) .card-img { aspect-ratio: 3/4; }
+    .card:nth-child(3n+2) .card-img { aspect-ratio: 4/3; }
+    .card:nth-child(3n)   .card-img { aspect-ratio: 1/1; }
+    .card-img img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .card-date {
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .card-title {
+      font-family: var(--serif);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+    .card-excerpt {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.85;
+      max-width: 400px;
+    }
+
+    /* ===== FRIENDS ===== */
+    #friends {
+      background: var(--bg-warm);
+    }
+    .friends-content {
+      max-width: 680px;
+    }
+    .friends-content .label {
+      display: block;
+      margin-bottom: 14px;
+    }
+    .friends-content h2 {
+      font-family: var(--serif);
+      font-size: clamp(1.5rem, 2.8vw, 2rem);
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.4;
+      margin-bottom: 32px;
+    }
+    .friends-content p {
+      font-size: 0.92rem;
+      color: var(--text);
+      line-height: 2.1;
+      font-weight: 300;
+      margin-bottom: 1.2em;
+    }
+    .friends-content p:last-child { margin-bottom: 0; }
+
+    /* Friend cards */
+    .friend-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-top: 56px;
+    }
+    .friend-card {
+      text-align: center;
+      cursor: pointer;
+      transition: opacity 0.25s;
+    }
+    .friend-card:hover { opacity: 0.8; }
+    .friend-card-avatar {
+      width: 100%;
+      aspect-ratio: 1/1;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-bottom: 14px;
+      background: var(--bg-cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--line);
+      font-size: 0.65rem;
+      letter-spacing: 0.06em;
+    }
+    .friend-card-avatar img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .friend-card-name {
+      font-family: var(--serif);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+    .friend-card-role {
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    /* ===== FOOTER / GET INVOLVED ===== */
+    .footer-section {
+      padding: 160px 56px;
+      text-align: center;
+      background: var(--bg);
+      border-top: 1px solid var(--line);
+    }
+    .footer-section .footer-logo {
+      font-family: var(--serif);
+      font-size: clamp(1.6rem, 4vw, 2.8rem);
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: 0.12em;
+      line-height: 1;
+      margin-bottom: 24px;
+    }
+    .footer-section .footer-tagline {
+      font-size: 0.88rem;
+      color: var(--muted);
+      letter-spacing: 0.16em;
+      font-weight: 300;
+    }
+    .footer-section .footer-involve {
+      margin-top: 56px;
+      padding-top: 40px;
+      border-top: 1px solid var(--line);
+    }
+    .footer-section .footer-involve .label {
+      display: block;
+      margin-bottom: 12px;
+    }
+    .footer-section .footer-involve a {
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink);
+      border-bottom: 1px solid var(--ink);
+      padding-bottom: 2px;
+      transition: opacity 0.2s;
+    }
+    .footer-section .footer-involve a:hover { opacity: 0.6; }
+    .footer-meta {
+      padding: 28px 56px;
+      text-align: center;
+      border-top: 1px solid var(--line);
+    }
+    .footer-meta span {
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      nav { padding: 0 24px; }
+      .intro { padding: 80px 24px; }
+      .section-wrap { padding: 64px 24px; }
+      .card-grid { columns: 1; }
+      .friend-grid { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+      .divider { padding: 0 24px; }
+      .footer-section { padding: 100px 24px; }
+      .footer-meta { padding: 20px 24px; }
+    }
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .friend-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<nav>
+  <a href="#top" class="nav-logo">TREESWITH</a>
+  <ul class="nav-links">
+    <li><a href="#story">The Story</a></li>
+    <li><a href="#friends">The Friends</a></li>
+  </ul>
+</nav>
+
+<!-- ===== HERO ===== -->
+<div id="top" class="hero">
+  <div class="hero-bg">
+    <div class="placeholder">Hero 背景图 · 建议 1920 x 1080</div>
+    <!-- <img src="images/hero.jpg" alt="TREESWITH"> -->
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-logo">TREESWITH</div>
+    <div class="hero-tagline">一段陪伴，正在生长。</div>
+  </div>
+  <div class="hero-scroll">
+    <span>Scroll</span>
+    <div class="hero-scroll-line"></div>
+  </div>
+</div>
+
+<!-- ===== INTRO ===== -->
+<div class="intro">
+  <p>我们来到这里，和孩子们在一起。</p>
+  <p>画画，唱歌，奔跑，做手工，听故事...</p>
+  <p>这件事从一次探访开始，后来变成了几乎每月一次的往返。</p>
+  <p>这里记录那些时间、笑容、与同行的人。</p>
+</div>
+
+<!-- ===== DIVIDER ===== -->
+<div class="divider"><div class="divider-line"></div></div>
+
+<!-- ===== THE STORY ===== -->
+<div id="story">
+  <div class="section-wrap">
+    <div class="story-header">
+      <span class="label">The Story</span>
+      <h2>最初，只是一次受邀前往山区小学的探访。</h2>
+    </div>
+
+    <div class="story-opening">
+      <p>后来我们发现，孩子们需要的不是偶尔的抵达，而是有人持续地看见他们。</p>
+      <p>于是我们带去了绘画、音乐、体育、舞蹈、手工和故事。</p>
+      <p>路程很长，来回六个多小时。但每一次出发都因为孩子们的等待而值得。</p>
+      <p>希望这件事能一直继续...</p>
+    </div>
+
+    <!-- Card waterfall — 按时间倒序排列，点击打开详情页 -->
+    <div class="card-grid">
+
+      <a class="card" href="activity.html?id=001">
+        <div class="card-img">📷</div>
+        <div class="card-date">2024 · Autumn</div>
+        <div class="card-title">活动标题</div>
+        <div class="card-excerpt">一两句简介，替换为真实内容。</div>
+      </a>
+
+      <a class="card" href="activity.html?id=002">
+        <div class="card-img">📷</div>
+        <div class="card-date">2024 · Spring</div>
+        <div class="card-title">活动标题</div>
+        <div class="card-excerpt">一两句简介，替换为真实内容。</div>
+      </a>
+
+      <a class="card" href="activity.html?id=003">
+        <div class="card-img">📷</div>
+        <div class="card-date">2023 · Autumn</div>
+        <div class="card-title">活动标题</div>
+        <div class="card-excerpt">一两句简介，替换为真实内容。</div>
+      </a>
+
+      <a class="card" href="activity.html?id=004">
+        <div class="card-img">📷</div>
+        <div class="card-date">2023 · Summer</div>
+        <div class="card-title">活动标题</div>
+        <div class="card-excerpt">一两句简介，替换为真实内容。</div>
+      </a>
+
+      <a class="card" href="activity.html?id=005">
+        <div class="card-img">📷</div>
+        <div class="card-date">2022 · Autumn</div>
+        <div class="card-title">活动标题</div>
+        <div class="card-excerpt">一两句简介，替换为真实内容。</div>
+      </a>
+
+      <a class="card" href="activity.html?id=006">
+        <div class="card-img">📷</div>
+        <div class="card-date">2021 · Autumn</div>
+        <div class="card-title">活动标题</div>
+        <div class="card-excerpt">一两句简介，替换为真实内容。</div>
+      </a>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===== DIVIDER ===== -->
+<div class="divider"><div class="divider-line"></div></div>
+
+<!-- ===== THE FRIENDS ===== -->
+<div id="friends">
+  <div class="section-wrap">
+    <div class="friends-content">
+      <span class="label">The Friends</span>
+      <h2>这些年，许多朋友一次次和我们一起出发。</h2>
+      <p>有人教画画，有人教唱歌，有人记录，有人准备物资，有人安静地陪伴。</p>
+      <p>每一种参与，都值得被郑重感谢。</p>
+    </div>
+
+    <div class="friend-grid">
+
+      <a class="friend-card" href="friend.html?id=001">
+        <div class="friend-card-avatar">📷</div>
+        <div class="friend-card-name">姓名</div>
+        <div class="friend-card-role">音乐制作人</div>
+      </a>
+
+      <a class="friend-card" href="friend.html?id=002">
+        <div class="friend-card-avatar">📷</div>
+        <div class="friend-card-name">姓名</div>
+        <div class="friend-card-role">平面设计师</div>
+      </a>
+
+      <a class="friend-card" href="friend.html?id=003">
+        <div class="friend-card-avatar">📷</div>
+        <div class="friend-card-name">姓名</div>
+        <div class="friend-card-role">体育教练</div>
+      </a>
+
+      <a class="friend-card" href="friend.html?id=004">
+        <div class="friend-card-avatar">📷</div>
+        <div class="friend-card-name">姓名</div>
+        <div class="friend-card-role">英语教师</div>
+      </a>
+
+      <a class="friend-card" href="friend.html?id=005">
+        <div class="friend-card-avatar">📷</div>
+        <div class="friend-card-name">姓名</div>
+        <div class="friend-card-role">心理咨询师</div>
+      </a>
+
+      <a class="friend-card" href="friend.html?id=006">
+        <div class="friend-card-avatar">📷</div>
+        <div class="friend-card-name">姓名</div>
+        <div class="friend-card-role">摄影师</div>
+      </a>
+
+      <a class="friend-card" href="friend.html?id=007">
+        <div class="friend-card-avatar">📷</div>
+        <div class="friend-card-name">姓名</div>
+        <div class="friend-card-role">舞蹈老师</div>
+      </a>
+
+      <a class="friend-card" href="friend.html?id=008">
+        <div class="friend-card-avatar">📷</div>
+        <div class="friend-card-name">姓名</div>
+        <div class="friend-card-role">手工艺人</div>
+      </a>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<div class="footer-section">
+  <div class="footer-logo">TREESWITH</div>
+  <div class="footer-tagline">与树，与孩子，与彼此。</div>
+  <div class="footer-involve">
+    <span class="label">Get Involved</span>
+    <a href="mailto:contact@treeswtih.com">加入我们</a>
+  </div>
+</div>
+<div class="footer-meta">
+  <span>&copy; 2025 TREESWITH &nbsp;&middot;&nbsp; treeswtih.com</span>
+</div>
+
+</body>
+</html>

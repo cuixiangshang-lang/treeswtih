@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>同行者 · TREESWITH</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Inter:wght@200;300;400;500&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    :root {
+      --bg:        #ffffff;
+      --bg-warm:   #f8f6f3;
+      --bg-cream:  #f3f0eb;
+      --ink:       #1c1c1c;
+      --text:      #3a3a3a;
+      --muted:     #9a9590;
+      --line:      #e5e2dc;
+      --accent:    #5c7a52;
+      --serif:     'Noto Serif SC', 'Georgia', serif;
+      --sans:      'Inter', 'Noto Sans SC', sans-serif;
+    }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.85;
+      -webkit-font-smoothing: antialiased;
+      font-weight: 300;
+    }
+    img { max-width: 100%; display: block; }
+    a { color: inherit; text-decoration: none; }
+
+    /* ===== NAV ===== */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 56px;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-logo {
+      font-family: var(--serif);
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: var(--ink);
+      letter-spacing: 0.08em;
+    }
+    .nav-back {
+      font-size: 0.72rem;
+      font-weight: 400;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+    .nav-back:hover { color: var(--ink); }
+
+    /* ===== LABEL ===== */
+    .label {
+      font-size: 0.62rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    /* ===== FRIEND HERO ===== */
+    .friend-hero {
+      margin-top: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 56px 60px;
+    }
+    .friend-avatar {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-bottom: 24px;
+      background: var(--bg-cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--line);
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+    }
+    .friend-avatar img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+
+    /* ===== FRIEND BODY ===== */
+    .friend-body {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 56px 120px;
+      text-align: center;
+    }
+    .friend-role {
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .friend-name {
+      font-family: var(--serif);
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.35;
+      margin-bottom: 40px;
+      letter-spacing: -0.01em;
+    }
+    .friend-text {
+      text-align: left;
+    }
+    .friend-text p {
+      font-size: 0.92rem;
+      color: var(--text);
+      line-height: 2.1;
+      margin-bottom: 1.2em;
+    }
+    .friend-text p:last-child { margin-bottom: 0; }
+
+    /* ===== GALLERY ===== */
+    .friend-gallery {
+      margin-top: 64px;
+      padding-top: 64px;
+      border-top: 1px solid var(--line);
+      text-align: left;
+    }
+    .friend-gallery .label {
+      display: block;
+      margin-bottom: 24px;
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .gallery-grid .photo {
+      aspect-ratio: 4/3;
+      overflow: hidden;
+      border-radius: 2px;
+      background: var(--bg-cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--line);
+      font-size: 0.65rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .gallery-grid .photo:hover { opacity: 0.85; }
+    .gallery-grid .photo img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+
+    /* ===== BACK ===== */
+    .back-link {
+      text-align: center;
+      padding: 48px 56px 80px;
+    }
+    .back-link a {
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 2px;
+      transition: color 0.3s;
+    }
+    .back-link a:hover { color: var(--ink); }
+
+    /* ===== LIGHTBOX ===== */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.97);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .lightbox.active { display: flex; }
+    .lightbox img {
+      max-width: 85vw;
+      max-height: 85vh;
+      object-fit: contain;
+      cursor: default;
+    }
+    .lb-close {
+      position: fixed;
+      top: 28px;
+      right: 36px;
+      font-size: 1.4rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color 0.2s;
+      font-weight: 200;
+    }
+    .lb-close:hover { color: var(--ink); }
+
+    @media (max-width: 900px) {
+      nav { padding: 0 24px; }
+      .friend-hero { padding: 60px 24px 40px; }
+      .friend-body { padding: 0 24px 80px; }
+      .friend-avatar { width: 110px; height: 110px; }
+      .gallery-grid { grid-template-columns: 1fr; }
+      .back-link { padding: 32px 24px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<nav>
+  <a href="index.html" class="nav-logo">TREESWITH</a>
+  <a href="index.html#friends" class="nav-back">&larr; Back to Friends</a>
+</nav>
+
+<!-- ===== AVATAR ===== -->
+<div class="friend-hero">
+  <div class="friend-avatar">📷</div>
+  <!-- <img class="friend-avatar" src="images/friends/xxx.jpg" alt=""> -->
+</div>
+
+<!-- ===== BODY ===== -->
+<div class="friend-body">
+  <div class="friend-role">音乐制作人 · Since 2017</div>
+  <h1 class="friend-name">姓名</h1>
+  <div class="friend-text">
+    <p>在这里写这位朋友的故事。TA是谁、做什么的、为什么愿意跟着一起出发、给孩子们带来了什么、留下的难忘瞬间...</p>
+    <p>替换为真实内容。每段之间留空行。</p>
+    <p>可以写很多段，没有限制。</p>
+  </div>
+
+  <div class="friend-gallery">
+    <span class="label">Moments</span>
+    <div class="gallery-grid">
+      <div class="photo">📷</div>
+      <div class="photo">📷</div>
+      <div class="photo">📷</div>
+      <div class="photo">📷</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== BACK ===== -->
+<div class="back-link">
+  <a href="index.html#friends">返回全部同行者</a>
+</div>
+
+<!-- ===== LIGHTBOX ===== -->
+<div class="lightbox" id="lightbox">
+  <span class="lb-close" onclick="closeLb()">&times;</span>
+  <img id="lb-img" src="" alt="" onclick="event.stopPropagation()" />
+</div>
+
+<script>
+  document.querySelectorAll('.gallery-grid .photo img').forEach(img => {
+    img.addEventListener('click', () => {
+      document.getElementById('lb-img').src = img.src;
+      document.getElementById('lightbox').classList.add('active');
+    });
+  });
+  document.getElementById('lightbox').addEventListener('click', closeLb);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLb(); });
+  function closeLb() { document.getElementById('lightbox').classList.remove('active'); }
+
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id') || '';
+  if (id) document.title = '同行者 #' + id + ' · TREESWITH';
+</script>
+</body>
+</html>
