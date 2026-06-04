@@ -387,6 +387,17 @@
       </div>
 
       <div class="form-group">
+        <label>首页 Hero 背景图</label>
+        <div style="margin-bottom:8px;">
+          <div id="heroImagePreview" style="width:100%;max-width:400px;height:200px;background:var(--bg-cream);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:0.75rem;margin-bottom:8px;overflow:hidden;">
+            暂无图片
+          </div>
+          <input type="file" id="heroImageInput" accept="image/*" onchange="uploadHeroImage()" style="font-size:0.8rem;" />
+          <input type="hidden" id="setHeroImage" />
+        </div>
+      </div>
+
+      <div class="form-group">
         <label>引言文字（用换行分隔段落）</label>
         <textarea id="setIntro" style="min-height:140px;"></textarea>
       </div>
@@ -838,6 +849,14 @@ function renderSettings() {
   document.getElementById('setSiteTitle').value = content.site?.title || '';
   document.getElementById('setSiteTagline').value = content.site?.tagline || '';
   document.getElementById('setEmail').value = content.site?.email || '';
+  document.getElementById('setHeroImage').value = content.site?.heroImage || '';
+  // Hero image preview
+  const heroPreview = document.getElementById('heroImagePreview');
+  if (content.site?.heroImage) {
+    heroPreview.innerHTML = '<img src="' + content.site.heroImage + '" style="width:100%;height:100%;object-fit:cover;">';
+  } else {
+    heroPreview.innerHTML = '暂无图片';
+  }
   document.getElementById('setIntro').value = content.intro || '';
   document.getElementById('setStoryTitle').value = content.story?.title || '';
   document.getElementById('setStoryText').value = content.story?.text || '';
@@ -851,6 +870,7 @@ async function saveSettings() {
     tagline: document.getElementById('setSiteTagline').value.trim(),
     email: document.getElementById('setEmail').value.trim(),
     domain: content.site?.domain || 'treeswith.com',
+    heroImage: document.getElementById('setHeroImage').value,
   };
   content.intro = document.getElementById('setIntro').value;
   content.story = {
@@ -870,6 +890,25 @@ async function saveSettings() {
 }
 
 // ===== IMAGE PREVIEW HELPERS =====
+async function uploadHeroImage() {
+  const file = document.getElementById('heroImageInput').files[0];
+  if (!file) return;
+  try {
+    toast('正在上传...', 'info');
+    const form = new FormData();
+    form.append('file', file);
+    const res = await fetch(UPLOAD_API, { method: 'POST', body: form });
+    const data = await res.json();
+    if (data.url) {
+      document.getElementById('setHeroImage').value = data.url;
+      document.getElementById('heroImagePreview').innerHTML = '<img src="' + data.url + '" style="width:100%;height:100%;object-fit:cover;">';
+      toast('Hero 图片上传成功');
+    } else {
+      toast('上传失败', 'error');
+    }
+  } catch (e) { toast('上传失败：' + e.message, 'error'); }
+}
+
 function renderPreviewSingle(containerId, url) {
   const container = document.getElementById(containerId);
   container.innerHTML = `

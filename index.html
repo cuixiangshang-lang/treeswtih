@@ -535,6 +535,14 @@
     const res = await fetch('/api/content');
     const data = await res.json();
 
+    // Hero image
+    if (data.site && data.site.heroImage) {
+      const heroBg = document.querySelector('.hero-bg');
+      if (heroBg) {
+        heroBg.innerHTML = '<img src="' + data.site.heroImage + '" alt="TREESWITH">';
+      }
+    }
+
     // Intro
     if (data.intro) {
       const introEl = document.querySelector('.intro');

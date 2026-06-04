@@ -5,7 +5,8 @@ const DEFAULT_CONTENT = {
     title: 'TREESWITH',
     tagline: '一段陪伴，正在生长。',
     email: '87225924@qq.com',
-    domain: 'treeswith.com'
+    domain: 'treeswith.com',
+    heroImage: ''
   },
   intro: '我们来到这里，和孩子们在一起。\n\n画画，唱歌，奔跑，做手工，听故事...\n\n这件事从一次探访开始，后来变成了几乎每月一次的往返。\n\n这里记录那些时间、笑容、与同行的人。',
   story: {
