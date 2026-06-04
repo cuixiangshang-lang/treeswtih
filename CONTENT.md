@@ -10,7 +10,7 @@
 | 项目 | 内容 |
 |------|------|
 | 网站名称 | TreesWith |
-| 域名 | treeswtih.com |
+| 域名 | treeswith.com |
 | 导航标签 | About / Archive / Friends / Gallery / Contact |
 | 页脚版权 | © 2025 TreesWith |
 
@@ -172,7 +172,7 @@
 | 英文标签 | Get Involved | ✅ 保留 |
 | 标题 | 加入我们 | 可保留或改 |
 | 正文 | 我们不需要你有什么特殊技能…… | 可保留或改 |
-| 联系邮箱 | contact@treeswtih.com | 替换为真实邮箱 |
+| 联系邮箱 | contact@treeswith.com | 替换为真实邮箱 |
 | WeChat 链接 | #（未填） | 填入微信号或二维码图片 |
 | Weibo 链接 | #（未填） | 填入微博链接 |
 

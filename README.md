@@ -1,14 +1,14 @@
 # 与孩子同行 · 乡村公益网站
 
 > 十年乡村公益陪伴活动展示网站  
-> 域名：treeswtih.com
+> 域名：treeswith.com
 
 ---
 
 ## 📁 文件结构
 
 ```
-treeswtih-website/
+treeswith-website/
 ├── index.html      # 主页（全部内容在此文件）
 ├── vercel.json     # Vercel 部署配置
 ├── images/         # 放你的照片（建议按年份分文件夹）
@@ -55,12 +55,12 @@ treeswtih-website/
 
 ---
 
-## 🚀 部署到 Vercel（绑定 treeswtih.com）
+## 🚀 部署到 Vercel（绑定 treeswith.com）
 
 ### 第一步：上传到 GitHub
 1. 注册/登录 [github.com](https://github.com)
 2. 新建一个仓库，名称任意（如 `my-charity-site`）
-3. 将整个 `treeswtih-website` 文件夹上传
+3. 将整个 `treeswith-website` 文件夹上传
 
 ### 第二步：连接 Vercel
 1. 登录 [vercel.com](https://vercel.com)（可用 GitHub 账号登录）
@@ -70,7 +70,7 @@ treeswtih-website/
 
 ### 第三步：绑定域名
 1. 在 Vercel 项目页面，进入 Settings → Domains
-2. 输入 `treeswtih.com`，点击 Add
+2. 输入 `treeswith.com`，点击 Add
 3. Vercel 会告诉你需要在域名注册商那里添加的 DNS 记录
 4. 按照提示在你购买域名的平台（如阿里云、腾讯云、GoDaddy）修改 DNS
 5. 等待 5-30 分钟生效
