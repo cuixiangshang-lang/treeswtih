@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TREESWITH Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #ffffff; --bg-warm: #f8f6f3; --bg-cream: #f3f0eb;
+      --ink: #1c1c1c; --text: #3a3a3a; --muted: #9a9590; --line: #e5e2dc;
+      --accent: #5c7a52; --danger: #c0392b;
+      --serif: 'Noto Serif SC', Georgia, serif;
+      --sans: 'Inter', sans-serif;
+      --radius: 4px;
+    }
+    body { font-family: var(--sans); background: var(--bg-warm); color: var(--text); font-size: 14px; font-weight: 300; line-height: 1.7; }
+    input, textarea, select, button { font-family: var(--sans); font-size: 14px; }
+    a { color: var(--accent); text-decoration: none; }
+
+    /* ===== LOGIN ===== */
+    .login-screen {
+      display: flex; align-items: center; justify-content: center; min-height: 100vh;
+    }
+    .login-box {
+      background: var(--bg); border: 1px solid var(--line); padding: 56px 48px;
+      width: 380px; text-align: center;
+    }
+    .login-box h1 {
+      font-family: var(--serif); font-size: 1.4rem; font-weight: 600;
+      color: var(--ink); letter-spacing: 0.1em; margin-bottom: 8px;
+    }
+    .login-box p { color: var(--muted); font-size: 0.78rem; margin-bottom: 32px; }
+    .login-box input {
+      width: 100%; padding: 12px 16px; border: 1px solid var(--line);
+      background: var(--bg); font-size: 0.85rem; outline: none; margin-bottom: 16px;
+      transition: border-color 0.2s;
+    }
+    .login-box input:focus { border-color: var(--accent); }
+    .login-box button {
+      width: 100%; padding: 12px; background: var(--ink); color: var(--bg);
+      border: none; cursor: pointer; font-weight: 400; letter-spacing: 0.06em;
+      font-size: 0.78rem; transition: opacity 0.2s;
+    }
+    .login-box button:hover { opacity: 0.85; }
+    .login-error { color: var(--danger); font-size: 0.75rem; margin-bottom: 12px; min-height: 18px; }
+
+    /* ===== MAIN LAYOUT ===== */
+    .app { display: none; min-height: 100vh; }
+    .app.active { display: block; }
+    .topbar {
+      background: var(--bg); border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px; height: 56px; position: sticky; top: 0; z-index: 50;
+    }
+    .topbar-logo { font-family: var(--serif); font-weight: 600; font-size: 0.9rem; letter-spacing: 0.08em; color: var(--ink); }
+    .topbar-logo span { color: var(--muted); font-weight: 300; font-size: 0.7rem; letter-spacing: 0.1em; margin-left: 8px; }
+    .topbar-right { display: flex; align-items: center; gap: 20px; }
+    .topbar-right a { font-size: 0.72rem; letter-spacing: 0.08em; color: var(--muted); transition: color 0.2s; }
+    .topbar-right a:hover { color: var(--ink); }
+    .topbar-right button {
+      background: none; border: 1px solid var(--line); padding: 6px 16px;
+      font-size: 0.7rem; letter-spacing: 0.08em; cursor: pointer; color: var(--muted);
+      transition: all 0.2s;
+    }
+    .topbar-right button:hover { border-color: var(--ink); color: var(--ink); }
+
+    /* ===== TABS ===== */
+    .tabs {
+      display: flex; gap: 0; background: var(--bg); border-bottom: 1px solid var(--line);
+      padding: 0 40px;
+    }
+    .tab {
+      padding: 16px 24px; font-size: 0.75rem; letter-spacing: 0.1em; color: var(--muted);
+      cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s;
+      background: none; border-top: none; border-left: none; border-right: none;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--ink); border-bottom-color: var(--ink); }
+
+    /* ===== CONTENT AREA ===== */
+    .content { padding: 40px; max-width: 1000px; margin: 0 auto; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ===== COMMON FORM ===== */
+    .section-title {
+      font-family: var(--serif); font-size: 1.2rem; font-weight: 600;
+      color: var(--ink); margin-bottom: 8px;
+    }
+    .section-desc { color: var(--muted); font-size: 0.78rem; margin-bottom: 32px; }
+    .form-group { margin-bottom: 24px; }
+    .form-group label {
+      display: block; font-size: 0.72rem; letter-spacing: 0.08em;
+      color: var(--muted); margin-bottom: 8px; text-transform: uppercase;
+    }
+    .form-group input[type="text"],
+    .form-group textarea {
+      width: 100%; padding: 12px 16px; border: 1px solid var(--line);
+      background: var(--bg); outline: none; transition: border-color 0.2s; resize: vertical;
+    }
+    .form-group input:focus, .form-group textarea:focus { border-color: var(--accent); }
+    .form-group textarea { min-height: 120px; line-height: 1.8; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 24px; font-size: 0.75rem; letter-spacing: 0.08em;
+      cursor: pointer; border: 1px solid var(--line); background: var(--bg);
+      color: var(--ink); transition: all 0.2s;
+    }
+    .btn:hover { border-color: var(--ink); }
+    .btn-primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-danger { border-color: var(--danger); color: var(--danger); }
+    .btn-danger:hover { background: var(--danger); color: var(--bg); }
+    .btn-sm { padding: 6px 14px; font-size: 0.68rem; }
+    .btn-group { display: flex; gap: 12px; margin-top: 32px; }
+
+    /* ===== UPLOAD AREA ===== */
+    .upload-area {
+      border: 2px dashed var(--line); padding: 32px; text-align: center;
+      cursor: pointer; transition: border-color 0.2s, background 0.2s; margin-bottom: 16px;
+      position: relative;
+    }
+    .upload-area:hover { border-color: var(--muted); background: var(--bg-warm); }
+    .upload-area input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer;
+    }
+    .upload-area .upload-icon { font-size: 1.5rem; margin-bottom: 8px; }
+    .upload-area p { font-size: 0.72rem; color: var(--muted); }
+    .upload-preview {
+      display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px;
+    }
+    .upload-preview-item {
+      position: relative; width: 80px; height: 80px; border-radius: 2px;
+      overflow: hidden; border: 1px solid var(--line);
+    }
+    .upload-preview-item img { width: 100%; height: 100%; object-fit: cover; }
+    .upload-preview-item .remove-btn {
+      position: absolute; top: 4px; right: 4px; width: 20px; height: 20px;
+      background: rgba(0,0,0,0.6); color: #fff; border: none; cursor: pointer;
+      font-size: 11px; display: flex; align-items: center; justify-content: center;
+      border-radius: 50%; opacity: 0; transition: opacity 0.2s;
+    }
+    .upload-preview-item:hover .remove-btn { opacity: 1; }
+
+    /* ===== LIST ===== */
+    .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .item-list { display: flex; flex-direction: column; gap: 2px; }
+    .item-row {
+      display: grid; grid-template-columns: 56px 1fr 140px 120px 80px;
+      gap: 16px; align-items: center; padding: 16px; background: var(--bg);
+      border: 1px solid var(--line); cursor: pointer; transition: background 0.2s;
+    }
+    .item-row:hover { background: var(--bg-warm); }
+    .item-thumb {
+      width: 56px; height: 56px; background: var(--bg-cream); border-radius: 2px;
+      overflow: hidden; display: flex; align-items: center; justify-content: center;
+      color: var(--line); font-size: 0.65rem;
+    }
+    .item-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .item-info h4 { font-family: var(--serif); font-size: 0.9rem; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+    .item-info p { font-size: 0.72rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 360px; }
+    .item-date { font-size: 0.68rem; color: var(--muted); letter-spacing: 0.06em; }
+    .item-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+    /* ===== EDIT VIEW ===== */
+    .edit-back {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.72rem; color: var(--muted); cursor: pointer;
+      margin-bottom: 24px; background: none; border: none; letter-spacing: 0.06em;
+    }
+    .edit-back:hover { color: var(--ink); }
+
+    /* ===== FRIENDS GRID ===== */
+    .friend-item-row {
+      display: grid; grid-template-columns: 48px 1fr 140px 100px;
+      gap: 16px; align-items: center; padding: 14px 16px; background: var(--bg);
+      border: 1px solid var(--line); cursor: pointer; transition: background 0.2s;
+    }
+    .friend-item-row:hover { background: var(--bg-warm); }
+
+    /* ===== TOAST ===== */
+    .toast-container { position: fixed; top: 72px; right: 24px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; }
+    .toast {
+      padding: 12px 20px; background: var(--bg); border: 1px solid var(--line);
+      font-size: 0.75rem; color: var(--ink); box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      animation: toastIn 0.3s ease;
+    }
+    .toast.success { border-left: 3px solid var(--accent); }
+    .toast.error { border-left: 3px solid var(--danger); }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ===== CONFIRM DIALOG ===== */
+    .confirm-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 200;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .confirm-box {
+      background: var(--bg); padding: 32px; width: 360px; text-align: center;
+      border: 1px solid var(--line);
+    }
+    .confirm-box h3 { font-family: var(--serif); font-size: 1rem; margin-bottom: 12px; color: var(--ink); }
+    .confirm-box p { font-size: 0.8rem; color: var(--muted); margin-bottom: 24px; }
+    .confirm-box .btn-group { justify-content: center; margin-top: 0; }
+
+    /* ===== LOADING ===== */
+    .loading { text-align: center; padding: 60px; color: var(--muted); font-size: 0.8rem; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .topbar, .tabs, .content { padding-left: 20px; padding-right: 20px; }
+      .item-row { grid-template-columns: 48px 1fr 80px; }
+      .item-row .item-date { display: none; }
+      .item-row .item-actions { width: 100%; justify-content: flex-start; }
+      .friend-item-row { grid-template-columns: 40px 1fr 80px; }
+      .friend-item-row .friend-item-role { display: none; }
+      .form-row { grid-template-columns: 1fr; }
+      .login-box { width: 90%; padding: 40px 28px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-box">
+    <h1>TREESWITH</h1>
+    <p>管理后台</p>
+    <div id="loginError" class="login-error"></div>
+    <input type="password" id="loginPassword" placeholder="输入管理密码" autofocus />
+    <button onclick="doLogin()">进入</button>
+  </div>
+</div>
+
+<!-- ===== APP ===== -->
+<div id="app" class="app">
+  <div class="topbar">
+    <div class="topbar-logo">TREESWITH <span>Admin</span></div>
+    <div class="topbar-right">
+      <a href="/" target="_blank">查看网站 →</a>
+      <button onclick="doLogout()">退出</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="activities">活动管理</button>
+    <button class="tab" data-tab="friends">同行者管理</button>
+    <button class="tab" data-tab="settings">页面设置</button>
+  </div>
+
+  <div class="content">
+    <!-- Activities Panel -->
+    <div id="panel-activities" class="tab-panel active">
+      <div id="activitiesList">
+        <div class="section-title">活动管理</div>
+        <div class="section-desc">管理所有探访活动记录。添加新活动后，网站会自动更新。</div>
+        <div class="list-header">
+          <span style="font-size:0.72rem;color:var(--muted);" id="activityCount">0 个活动</span>
+          <button class="btn btn-primary btn-sm" onclick="editActivity('new')">+ 新建活动</button>
+        </div>
+        <div id="activityItems" class="item-list"></div>
+      </div>
+      <div id="activityEdit" style="display:none;">
+        <button class="edit-back" onclick="showActivityList()">← 返回列表</button>
+        <div class="section-title" id="activityEditTitle">新建活动</div>
+        <div class="section-desc" id="activityEditDesc">填写活动信息，上传照片。</div>
+        <input type="hidden" id="actEditId" />
+        <div class="form-group">
+          <label>日期</label>
+          <input type="text" id="actDate" placeholder="例如：2024 · 秋季" />
+        </div>
+        <div class="form-group">
+          <label>标题</label>
+          <input type="text" id="actTitle" placeholder="活动标题" />
+        </div>
+        <div class="form-group">
+          <label>简介</label>
+          <textarea id="actDesc" placeholder="一两句话的简介，显示在卡片上"></textarea>
+        </div>
+        <div class="form-group">
+          <label>详细故事</label>
+          <textarea id="actStory" placeholder="详细的活动记录，显示在详情页" style="min-height:200px;"></textarea>
+        </div>
+        <div class="form-group">
+          <label>封面图</label>
+          <div class="upload-area" id="actCoverUpload">
+            <input type="file" accept="image/*" onchange="handleCoverUpload(event)" />
+            <div class="upload-icon">+</div>
+            <p>点击或拖拽上传封面图</p>
+          </div>
+          <div class="upload-preview" id="actCoverPreview"></div>
+        </div>
+        <div class="form-group">
+          <label>照片集</label>
+          <div class="upload-area" id="actGalleryUpload">
+            <input type="file" accept="image/*" multiple onchange="handleGalleryUpload(event)" />
+            <div class="upload-icon">+</div>
+            <p>点击或拖拽上传照片（可多选）</p>
+          </div>
+          <div class="upload-preview" id="actGalleryPreview"></div>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="saveActivity()">保存</button>
+          <button class="btn btn-danger btn-sm" id="actDeleteBtn" style="display:none;" onclick="deleteActivity()">删除</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Friends Panel -->
+    <div id="panel-friends" class="tab-panel">
+      <div id="friendsList">
+        <div class="section-title">同行者管理</div>
+        <div class="section-desc">管理参与公益活动的朋友们。添加后网站自动更新。</div>
+        <div class="list-header">
+          <span style="font-size:0.72rem;color:var(--muted);" id="friendCount">0 位同行者</span>
+          <button class="btn btn-primary btn-sm" onclick="editFriend('new')">+ 添加同行者</button>
+        </div>
+        <div id="friendItems" class="item-list"></div>
+      </div>
+      <div id="friendEdit" style="display:none;">
+        <button class="edit-back" onclick="showFriendList()">← 返回列表</button>
+        <div class="section-title" id="friendEditTitle">添加同行者</div>
+        <div class="section-desc" id="friendEditDesc">填写朋友信息，上传头像和照片。</div>
+        <input type="hidden" id="frEditId" />
+        <div class="form-group">
+          <label>姓名</label>
+          <input type="text" id="frName" placeholder="朋友姓名" />
+        </div>
+        <div class="form-group">
+          <label>专业身份</label>
+          <input type="text" id="frRole" placeholder="例如：音乐制作人、摄影师" />
+        </div>
+        <div class="form-group">
+          <label>加入年份</label>
+          <input type="text" id="frSince" placeholder="例如：2017" />
+        </div>
+        <div class="form-group">
+          <label>个人故事</label>
+          <textarea id="frBio" placeholder="介绍这位朋友的专业背景和参与公益的故事" style="min-height:180px;"></textarea>
+        </div>
+        <div class="form-group">
+          <label>头像</label>
+          <div class="upload-area" id="frAvatarUpload">
+            <input type="file" accept="image/*" onchange="handleAvatarUpload(event)" />
+            <div class="upload-icon">+</div>
+            <p>点击上传头像（建议正方形）</p>
+          </div>
+          <div class="upload-preview" id="frAvatarPreview"></div>
+        </div>
+        <div class="form-group">
+          <label>照片集</label>
+          <div class="upload-area" id="frPhotosUpload">
+            <input type="file" accept="image/*" multiple onchange="handleFriendPhotosUpload(event)" />
+            <div class="upload-icon">+</div>
+            <p>点击上传照片（可多选）</p>
+          </div>
+          <div class="upload-preview" id="frPhotosPreview"></div>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="saveFriend()">保存</button>
+          <button class="btn btn-danger btn-sm" id="frDeleteBtn" style="display:none;" onclick="deleteFriend()">删除</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div id="panel-settings" class="tab-panel">
+      <div class="section-title">页面设置</div>
+      <div class="section-desc">修改网站首页的文字内容。</div>
+
+      <div class="form-group">
+        <label>网站标题</label>
+        <input type="text" id="setSiteTitle" />
+      </div>
+      <div class="form-group">
+        <label>副标题</label>
+        <input type="text" id="setSiteTagline" />
+      </div>
+      <div class="form-group">
+        <label>联系邮箱</label>
+        <input type="text" id="setEmail" />
+      </div>
+
+      <div class="form-group">
+        <label>引言文字（用换行分隔段落）</label>
+        <textarea id="setIntro" style="min-height:140px;"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>故事标题</label>
+        <input type="text" id="setStoryTitle" />
+      </div>
+      <div class="form-group">
+        <label>故事正文（用换行分隔段落）</label>
+        <textarea id="setStoryText" style="min-height:160px;"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>同行者板块标题</label>
+        <input type="text" id="setFriendsTitle" />
+      </div>
+      <div class="form-group">
+        <label>同行者板块段落（用换行分隔，每行一段）</label>
+        <textarea id="setFriendsParas" style="min-height:100px;"></textarea>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="saveSettings()">保存设置</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Confirm Dialog -->
+<div id="confirmOverlay" class="confirm-overlay" style="display:none;">
+  <div class="confirm-box">
+    <h3 id="confirmTitle">确认删除？</h3>
+    <p id="confirmMsg">删除后无法恢复。</p>
+    <div class="btn-group">
+      <button class="btn btn-sm" onclick="closeConfirm()">取消</button>
+      <button class="btn btn-danger btn-sm" id="confirmBtn" onclick="confirmAction()">删除</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== STATE =====
+let content = null;
+let password = '';
+let pendingConfirm = null;
+let tempData = {
+  activity: { cover: '', gallery: [] },
+  friend: { avatar: '', photos: [] }
+};
+
+// ===== API =====
+const API = '/api/content';
+const UPLOAD_API = '/api/upload';
+
+async function apiGet() {
+  const res = await fetch(API);
+  if (!res.ok) throw new Error('Failed to fetch');
+  return await res.json();
+}
+
+async function apiSave(data) {
+  const res = await fetch(API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password, ...data })
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || 'Save failed');
+  }
+  return await res.json();
+}
+
+async function uploadImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const dataUrl = reader.result;
+      const base64 = dataUrl.split(',')[1];
+      const contentType = file.type || 'image/jpeg';
+      try {
+        const res = await fetch(UPLOAD_API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password, filename: file.name, data: base64, contentType })
+        });
+        if (!res.ok) throw new Error('Upload failed');
+        const result = await res.json();
+        resolve(result.url);
+      } catch (e) { reject(e); }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ===== TOAST =====
+function toast(msg, type = 'success') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+// ===== CONFIRM =====
+function showConfirm(title, msg, callback) {
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMsg').textContent = msg;
+  document.getElementById('confirmOverlay').style.display = 'flex';
+  pendingConfirm = callback;
+}
+function confirmAction() {
+  if (pendingConfirm) pendingConfirm();
+  closeConfirm();
+}
+function closeConfirm() {
+  document.getElementById('confirmOverlay').style.display = 'none';
+  pendingConfirm = null;
+}
+
+// ===== AUTH =====
+function doLogin() {
+  password = document.getElementById('loginPassword').value;
+  if (!password) { document.getElementById('loginError').textContent = '请输入密码'; return; }
+  // Test password by fetching content (any password can fetch)
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').classList.add('active');
+  loadContent();
+}
+function doLogout() {
+  password = '';
+  content = null;
+  document.getElementById('app').classList.remove('active');
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginPassword').value = '';
+  document.getElementById('loginError').textContent = '';
+}
+
+// Enter key on login
+document.getElementById('loginPassword').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') doLogin();
+});
+
+// ===== TABS =====
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// ===== LOAD CONTENT =====
+async function loadContent() {
+  try {
+    content = await apiGet();
+    renderActivities();
+    renderFriends();
+    renderSettings();
+  } catch (e) {
+    toast('加载失败：' + e.message, 'error');
+  }
+}
+
+// ===== ACTIVITIES =====
+function renderActivities() {
+  const list = document.getElementById('activityItems');
+  const activities = content.activities || [];
+  document.getElementById('activityCount').textContent = activities.length + ' 个活动';
+
+  if (activities.length === 0) {
+    list.innerHTML = '<div style="padding:48px;text-align:center;color:var(--muted);font-size:0.8rem;">暂无活动，点击「新建活动」开始添加。</div>';
+    return;
+  }
+
+  list.innerHTML = activities.map((a, i) => `
+    <div class="item-row" onclick="editActivity('${a.id}')">
+      <div class="item-thumb">${a.cover ? `<img src="${a.cover}" alt="">` : '📷'}</div>
+      <div class="item-info">
+        <h4>${escHtml(a.title) || '未命名'}</h4>
+        <p>${escHtml(a.description) || '暂无简介'}</p>
+      </div>
+      <div class="item-date">${escHtml(a.date)}</div>
+      <div class="item-actions">
+        <button class="btn btn-sm" onclick="event.stopPropagation();editActivity('${a.id}')">编辑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function showActivityList() {
+  document.getElementById('activitiesList').style.display = '';
+  document.getElementById('activityEdit').style.display = 'none';
+}
+
+function editActivity(id) {
+  document.getElementById('activitiesList').style.display = 'none';
+  document.getElementById('activityEdit').style.display = '';
+
+  tempData.activity = { cover: '', gallery: [] };
+  document.getElementById('actCoverPreview').innerHTML = '';
+  document.getElementById('actGalleryPreview').innerHTML = '';
+
+  if (id === 'new') {
+    document.getElementById('activityEditTitle').textContent = '新建活动';
+    document.getElementById('activityEditDesc').textContent = '填写活动信息，上传照片。';
+    document.getElementById('actEditId').value = '';
+    document.getElementById('actDate').value = '';
+    document.getElementById('actTitle').value = '';
+    document.getElementById('actDesc').value = '';
+    document.getElementById('actStory').value = '';
+    document.getElementById('actDeleteBtn').style.display = 'none';
+  } else {
+    const a = content.activities.find(x => x.id === id);
+    if (!a) return;
+    document.getElementById('activityEditTitle').textContent = '编辑活动';
+    document.getElementById('activityEditDesc').textContent = '修改活动信息。';
+    document.getElementById('actEditId').value = a.id;
+    document.getElementById('actDate').value = a.date || '';
+    document.getElementById('actTitle').value = a.title || '';
+    document.getElementById('actDesc').value = a.description || '';
+    document.getElementById('actStory').value = a.story || '';
+    document.getElementById('actDeleteBtn').style.display = '';
+
+    tempData.activity.cover = a.cover || '';
+    tempData.activity.gallery = [...(a.photos || [])];
+
+    if (a.cover) renderPreviewSingle('actCoverPreview', a.cover);
+    if (a.photos) renderPreviewMulti('actGalleryPreview', a.photos);
+  }
+}
+
+async function handleCoverUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  try {
+    toast('正在上传...');
+    const url = await uploadImage(file);
+    tempData.activity.cover = url;
+    renderPreviewSingle('actCoverPreview', url);
+    toast('上传成功');
+  } catch (e) { toast('上传失败：' + e.message, 'error'); }
+  event.target.value = '';
+}
+
+async function handleGalleryUpload(event) {
+  const files = Array.from(event.target.files);
+  if (!files.length) return;
+  try {
+    toast(`正在上传 ${files.length} 张图片...`);
+    for (const file of files) {
+      const url = await uploadImage(file);
+      tempData.activity.gallery.push(url);
+    }
+    renderPreviewMulti('actGalleryPreview', tempData.activity.gallery);
+    toast('上传成功');
+  } catch (e) { toast('上传失败：' + e.message, 'error'); }
+  event.target.value = '';
+}
+
+async function saveActivity() {
+  const id = document.getElementById('actEditId').value;
+  const data = {
+    date: document.getElementById('actDate').value.trim(),
+    title: document.getElementById('actTitle').value.trim(),
+    description: document.getElementById('actDesc').value.trim(),
+    story: document.getElementById('actStory').value.trim(),
+    cover: tempData.activity.cover,
+    photos: tempData.activity.gallery,
+  };
+
+  if (!data.title) { toast('请填写标题', 'error'); return; }
+
+  try {
+    if (id) {
+      const idx = content.activities.findIndex(x => x.id === id);
+      if (idx >= 0) content.activities[idx] = { ...content.activities[idx], ...data };
+    } else {
+      data.id = 'act_' + Date.now();
+      content.activities.unshift(data);
+    }
+    await apiSave(content);
+    content = await apiGet();
+    renderActivities();
+    showActivityList();
+    toast('保存成功');
+  } catch (e) { toast('保存失败：' + e.message, 'error'); }
+}
+
+function deleteActivity() {
+  const id = document.getElementById('actEditId').value;
+  showConfirm('确认删除？', '删除后无法恢复此活动。', async () => {
+    content.activities = content.activities.filter(x => x.id !== id);
+    try {
+      await apiSave(content);
+      content = await apiGet();
+      renderActivities();
+      showActivityList();
+      toast('已删除');
+    } catch (e) { toast('删除失败：' + e.message, 'error'); }
+  });
+}
+
+// ===== FRIENDS =====
+function renderFriends() {
+  const list = document.getElementById('friendItems');
+  const friends = content.friends || [];
+  document.getElementById('friendCount').textContent = friends.length + ' 位同行者';
+
+  if (friends.length === 0) {
+    list.innerHTML = '<div style="padding:48px;text-align:center;color:var(--muted);font-size:0.8rem;">暂无同行者，点击「添加同行者」开始。</div>';
+    return;
+  }
+
+  list.innerHTML = friends.map(f => `
+    <div class="friend-item-row" onclick="editFriend('${f.id}')">
+      <div class="item-thumb" style="width:48px;height:48px;border-radius:50%;">${f.avatar ? `<img src="${f.avatar}" alt="">` : '📷'}</div>
+      <div class="item-info">
+        <h4>${escHtml(f.name) || '未命名'}</h4>
+      </div>
+      <div class="item-date friend-item-role">${escHtml(f.role)}</div>
+      <div class="item-actions">
+        <button class="btn btn-sm" onclick="event.stopPropagation();editFriend('${f.id}')">编辑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function showFriendList() {
+  document.getElementById('friendsList').style.display = '';
+  document.getElementById('friendEdit').style.display = 'none';
+}
+
+function editFriend(id) {
+  document.getElementById('friendsList').style.display = 'none';
+  document.getElementById('friendEdit').style.display = '';
+
+  tempData.friend = { avatar: '', photos: [] };
+  document.getElementById('frAvatarPreview').innerHTML = '';
+  document.getElementById('frPhotosPreview').innerHTML = '';
+
+  if (id === 'new') {
+    document.getElementById('friendEditTitle').textContent = '添加同行者';
+    document.getElementById('friendEditDesc').textContent = '填写朋友信息，上传头像和照片。';
+    document.getElementById('frEditId').value = '';
+    document.getElementById('frName').value = '';
+    document.getElementById('frRole').value = '';
+    document.getElementById('frSince').value = '';
+    document.getElementById('frBio').value = '';
+    document.getElementById('frDeleteBtn').style.display = 'none';
+  } else {
+    const f = content.friends.find(x => x.id === id);
+    if (!f) return;
+    document.getElementById('friendEditTitle').textContent = '编辑同行者';
+    document.getElementById('friendEditDesc').textContent = '修改朋友信息。';
+    document.getElementById('frEditId').value = f.id;
+    document.getElementById('frName').value = f.name || '';
+    document.getElementById('frRole').value = f.role || '';
+    document.getElementById('frSince').value = f.since || '';
+    document.getElementById('frBio').value = f.bio || '';
+    document.getElementById('frDeleteBtn').style.display = '';
+
+    tempData.friend.avatar = f.avatar || '';
+    tempData.friend.photos = [...(f.photos || [])];
+
+    if (f.avatar) renderPreviewSingle('frAvatarPreview', f.avatar);
+    if (f.photos) renderPreviewMulti('frPhotosPreview', f.photos);
+  }
+}
+
+async function handleAvatarUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  try {
+    toast('正在上传...');
+    const url = await uploadImage(file);
+    tempData.friend.avatar = url;
+    renderPreviewSingle('frAvatarPreview', url);
+    toast('上传成功');
+  } catch (e) { toast('上传失败：' + e.message, 'error'); }
+  event.target.value = '';
+}
+
+async function handleFriendPhotosUpload(event) {
+  const files = Array.from(event.target.files);
+  if (!files.length) return;
+  try {
+    toast(`正在上传 ${files.length} 张图片...`);
+    for (const file of files) {
+      const url = await uploadImage(file);
+      tempData.friend.photos.push(url);
+    }
+    renderPreviewMulti('frPhotosPreview', tempData.friend.photos);
+    toast('上传成功');
+  } catch (e) { toast('上传失败：' + e.message, 'error'); }
+  event.target.value = '';
+}
+
+async function saveFriend() {
+  const id = document.getElementById('frEditId').value;
+  const data = {
+    name: document.getElementById('frName').value.trim(),
+    role: document.getElementById('frRole').value.trim(),
+    since: document.getElementById('frSince').value.trim(),
+    bio: document.getElementById('frBio').value.trim(),
+    avatar: tempData.friend.avatar,
+    photos: tempData.friend.photos,
+  };
+
+  if (!data.name) { toast('请填写姓名', 'error'); return; }
+
+  try {
+    if (id) {
+      const idx = content.friends.findIndex(x => x.id === id);
+      if (idx >= 0) content.friends[idx] = { ...content.friends[idx], ...data };
+    } else {
+      data.id = 'fr_' + Date.now();
+      content.friends.push(data);
+    }
+    await apiSave(content);
+    content = await apiGet();
+    renderFriends();
+    showFriendList();
+    toast('保存成功');
+  } catch (e) { toast('保存失败：' + e.message, 'error'); }
+}
+
+function deleteFriend() {
+  const id = document.getElementById('frEditId').value;
+  showConfirm('确认删除？', '删除后无法恢复此同行者。', async () => {
+    content.friends = content.friends.filter(x => x.id !== id);
+    try {
+      await apiSave(content);
+      content = await apiGet();
+      renderFriends();
+      showFriendList();
+      toast('已删除');
+    } catch (e) { toast('删除失败：' + e.message, 'error'); }
+  });
+}
+
+// ===== SETTINGS =====
+function renderSettings() {
+  document.getElementById('setSiteTitle').value = content.site?.title || '';
+  document.getElementById('setSiteTagline').value = content.site?.tagline || '';
+  document.getElementById('setEmail').value = content.site?.email || '';
+  document.getElementById('setIntro').value = content.intro || '';
+  document.getElementById('setStoryTitle').value = content.story?.title || '';
+  document.getElementById('setStoryText').value = content.story?.text || '';
+  document.getElementById('setFriendsTitle').value = content.friendsIntro?.title || '';
+  document.getElementById('setFriendsParas').value = (content.friendsIntro?.paragraphs || []).join('\n');
+}
+
+async function saveSettings() {
+  content.site = {
+    title: document.getElementById('setSiteTitle').value.trim(),
+    tagline: document.getElementById('setSiteTagline').value.trim(),
+    email: document.getElementById('setEmail').value.trim(),
+    domain: content.site?.domain || 'treeswith.com',
+  };
+  content.intro = document.getElementById('setIntro').value;
+  content.story = {
+    title: document.getElementById('setStoryTitle').value.trim(),
+    text: document.getElementById('setStoryText').value,
+  };
+  content.friendsIntro = {
+    title: document.getElementById('setFriendsTitle').value.trim(),
+    paragraphs: document.getElementById('setFriendsParas').value.split('\n').filter(l => l.trim()),
+  };
+
+  try {
+    await apiSave(content);
+    content = await apiGet();
+    toast('设置已保存');
+  } catch (e) { toast('保存失败：' + e.message, 'error'); }
+}
+
+// ===== IMAGE PREVIEW HELPERS =====
+function renderPreviewSingle(containerId, url) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = `
+    <div class="upload-preview-item">
+      <img src="${url}" alt="">
+      <button class="remove-btn" onclick="removeSinglePreview('${containerId}')">×</button>
+    </div>`;
+}
+
+function renderPreviewMulti(containerId, urls) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = urls.map((url, i) => `
+    <div class="upload-preview-item">
+      <img src="${url}" alt="">
+      <button class="remove-btn" onclick="removeMultiPreview('${containerId}', ${i})">×</button>
+    </div>`).join('');
+}
+
+function removeSinglePreview(containerId) {
+  document.getElementById(containerId).innerHTML = '';
+  // Clear the corresponding temp data
+  if (containerId === 'actCoverPreview') tempData.activity.cover = '';
+  if (containerId === 'frAvatarPreview') tempData.friend.avatar = '';
+}
+
+function removeMultiPreview(containerId, index) {
+  if (containerId === 'actGalleryPreview') tempData.activity.gallery.splice(index, 1);
+  if (containerId === 'frPhotosPreview') tempData.friend.photos.splice(index, 1);
+  // Re-render
+  if (containerId === 'actGalleryPreview') renderPreviewMulti(containerId, tempData.activity.gallery);
+  if (containerId === 'frPhotosPreview') renderPreviewMulti(containerId, tempData.friend.photos);
+}
+
+// ===== UTILS =====
+function escHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>

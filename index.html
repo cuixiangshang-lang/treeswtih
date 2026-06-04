@@ -430,6 +430,10 @@
       .nav-links { display: none; }
       .friend-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
     }
+
+    /* ===== SKELETON ===== */
+    .cms-loading { opacity: 0.4; transition: opacity 0.5s; }
+    .cms-loaded { opacity: 1; }
   </style>
 </head>
 <body>
@@ -487,50 +491,8 @@
     </div>
 
     <!-- Card waterfall — 按时间倒序排列，点击打开详情页 -->
-    <div class="card-grid">
-
-      <a class="card" href="activity.html?id=001">
-        <div class="card-img">📷</div>
-        <div class="card-date">2024 · Autumn</div>
-        <div class="card-title">活动标题</div>
-        <div class="card-excerpt">一两句简介，替换为真实内容。</div>
-      </a>
-
-      <a class="card" href="activity.html?id=002">
-        <div class="card-img">📷</div>
-        <div class="card-date">2024 · Spring</div>
-        <div class="card-title">活动标题</div>
-        <div class="card-excerpt">一两句简介，替换为真实内容。</div>
-      </a>
-
-      <a class="card" href="activity.html?id=003">
-        <div class="card-img">📷</div>
-        <div class="card-date">2023 · Autumn</div>
-        <div class="card-title">活动标题</div>
-        <div class="card-excerpt">一两句简介，替换为真实内容。</div>
-      </a>
-
-      <a class="card" href="activity.html?id=004">
-        <div class="card-img">📷</div>
-        <div class="card-date">2023 · Summer</div>
-        <div class="card-title">活动标题</div>
-        <div class="card-excerpt">一两句简介，替换为真实内容。</div>
-      </a>
-
-      <a class="card" href="activity.html?id=005">
-        <div class="card-img">📷</div>
-        <div class="card-date">2022 · Autumn</div>
-        <div class="card-title">活动标题</div>
-        <div class="card-excerpt">一两句简介，替换为真实内容。</div>
-      </a>
-
-      <a class="card" href="activity.html?id=006">
-        <div class="card-img">📷</div>
-        <div class="card-date">2021 · Autumn</div>
-        <div class="card-title">活动标题</div>
-        <div class="card-excerpt">一两句简介，替换为真实内容。</div>
-      </a>
-
+    <div class="card-grid" id="activityCards">
+      <!-- 由 JS 动态渲染 -->
     </div>
   </div>
 </div>
@@ -548,56 +510,8 @@
       <p>每一种参与，都值得被郑重感谢。</p>
     </div>
 
-    <div class="friend-grid">
-
-      <a class="friend-card" href="friend.html?id=001">
-        <div class="friend-card-avatar">📷</div>
-        <div class="friend-card-name">姓名</div>
-        <div class="friend-card-role">音乐制作人</div>
-      </a>
-
-      <a class="friend-card" href="friend.html?id=002">
-        <div class="friend-card-avatar">📷</div>
-        <div class="friend-card-name">姓名</div>
-        <div class="friend-card-role">平面设计师</div>
-      </a>
-
-      <a class="friend-card" href="friend.html?id=003">
-        <div class="friend-card-avatar">📷</div>
-        <div class="friend-card-name">姓名</div>
-        <div class="friend-card-role">体育教练</div>
-      </a>
-
-      <a class="friend-card" href="friend.html?id=004">
-        <div class="friend-card-avatar">📷</div>
-        <div class="friend-card-name">姓名</div>
-        <div class="friend-card-role">英语教师</div>
-      </a>
-
-      <a class="friend-card" href="friend.html?id=005">
-        <div class="friend-card-avatar">📷</div>
-        <div class="friend-card-name">姓名</div>
-        <div class="friend-card-role">心理咨询师</div>
-      </a>
-
-      <a class="friend-card" href="friend.html?id=006">
-        <div class="friend-card-avatar">📷</div>
-        <div class="friend-card-name">姓名</div>
-        <div class="friend-card-role">摄影师</div>
-      </a>
-
-      <a class="friend-card" href="friend.html?id=007">
-        <div class="friend-card-avatar">📷</div>
-        <div class="friend-card-name">姓名</div>
-        <div class="friend-card-role">舞蹈老师</div>
-      </a>
-
-      <a class="friend-card" href="friend.html?id=008">
-        <div class="friend-card-avatar">📷</div>
-        <div class="friend-card-name">姓名</div>
-        <div class="friend-card-role">手工艺人</div>
-      </a>
-
+    <div class="friend-grid" id="friendCards">
+      <!-- 由 JS 动态渲染 -->
     </div>
   </div>
 </div>
@@ -614,6 +528,89 @@
 <div class="footer-meta">
   <span>&copy; 2025 TREESWITH &nbsp;&middot;&nbsp; treeswith.com</span>
 </div>
+
+<script>
+(async function() {
+  try {
+    const res = await fetch('/api/content');
+    const data = await res.json();
+
+    // Intro
+    if (data.intro) {
+      const introEl = document.querySelector('.intro');
+      const paragraphs = data.intro.split('\n').filter(l => l.trim());
+      introEl.innerHTML = paragraphs.map(p => '<p>' + esc(p) + '</p>').join('');
+    }
+
+    // Story
+    if (data.story) {
+      const storyHeader = document.querySelector('.story-header h2');
+      const storyOpening = document.querySelector('.story-opening');
+      if (storyHeader && data.story.title) storyHeader.textContent = data.story.title;
+      if (storyOpening && data.story.text) {
+        const paragraphs = data.story.text.split('\n').filter(l => l.trim());
+        storyOpening.innerHTML = paragraphs.map(p => '<p>' + esc(p) + '</p>').join('');
+      }
+    }
+
+    // Friends intro
+    if (data.friendsIntro) {
+      const friendsTitle = document.querySelector('.friends-content h2');
+      const friendsParas = document.querySelectorAll('.friends-content p');
+      if (friendsTitle && data.friendsIntro.title) friendsTitle.textContent = data.friendsIntro.title;
+      if (data.friendsIntro.paragraphs && friendsParas.length) {
+        friendsParas.forEach((el, i) => {
+          if (data.friendsIntro.paragraphs[i]) el.textContent = data.friendsIntro.paragraphs[i];
+        });
+      }
+    }
+
+    // Activity cards
+    const cardContainer = document.getElementById('activityCards');
+    const activities = data.activities || [];
+    if (cardContainer && activities.length) {
+      cardContainer.innerHTML = activities.map(a =>
+        '<a class="card" href="activity.html?id=' + a.id + '">' +
+          '<div class="card-img">' + (a.cover ? '<img src="' + a.cover + '" alt="' + esc(a.title) + '">' : '📷') + '</div>' +
+          '<div class="card-date">' + esc(a.date) + '</div>' +
+          '<div class="card-title">' + esc(a.title) + '</div>' +
+          '<div class="card-excerpt">' + esc(a.description) + '</div>' +
+        '</a>'
+      ).join('');
+    }
+
+    // Friend cards
+    const friendContainer = document.getElementById('friendCards');
+    const friends = data.friends || [];
+    if (friendContainer && friends.length) {
+      friendContainer.innerHTML = friends.map(f =>
+        '<a class="friend-card" href="friend.html?id=' + f.id + '">' +
+          '<div class="friend-card-avatar">' + (f.avatar ? '<img src="' + f.avatar + '" alt="' + esc(f.name) + '">' : '📷') + '</div>' +
+          '<div class="friend-card-name">' + esc(f.name) + '</div>' +
+          '<div class="friend-card-role">' + esc(f.role) + '</div>' +
+        '</a>'
+      ).join('');
+    }
+
+    // Footer
+    if (data.site && data.site.email) {
+      const mailto = document.querySelector('.footer-involve a');
+      if (mailto) mailto.href = 'mailto:' + data.site.email;
+    }
+
+    document.body.classList.remove('cms-loading');
+    document.body.classList.add('cms-loaded');
+  } catch (e) {
+    // If API fails, show static fallback content — no action needed
+    console.log('CMS content load failed, using static fallback.');
+  }
+})();
+
+function esc(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
 
 </body>
 </html>
