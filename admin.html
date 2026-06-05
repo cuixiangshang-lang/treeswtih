@@ -488,8 +488,9 @@ async function uploadImage(file) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ password, filename: file.name, data: base64, contentType })
         });
-        if (!res.ok) throw new Error('Upload failed');
         const result = await res.json();
+        if (!res.ok) throw new Error(result.error || '上传失败（HTTP ' + res.status + '）');
+        if (!result.url) throw new Error('服务器未返回图片地址');
         resolve(result.url);
       } catch (e) { reject(e); }
     };
@@ -895,16 +896,11 @@ async function uploadHeroImage() {
   if (!file) return;
   try {
     toast('正在上传...', 'info');
-    const form = new FormData();
-    form.append('file', file);
-    const res = await fetch(UPLOAD_API, { method: 'POST', body: form });
-    const data = await res.json();
-    if (data.url) {
-      document.getElementById('setHeroImage').value = data.url;
-      document.getElementById('heroImagePreview').innerHTML = '<img src="' + data.url + '" style="width:100%;height:100%;object-fit:cover;">';
+    const url = await uploadImage(file);
+    if (url) {
+      document.getElementById('setHeroImage').value = url;
+      document.getElementById('heroImagePreview').innerHTML = '<img src="' + url + '" style="width:100%;height:100%;object-fit:cover;">';
       toast('Hero 图片上传成功');
-    } else {
-      toast('上传失败', 'error');
     }
   } catch (e) { toast('上传失败：' + e.message, 'error'); }
 }

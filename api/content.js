@@ -1,4 +1,6 @@
-import { put, head } from '@vercel/blob';
+import { put, list } from '@vercel/blob';
+
+const CONTENT_KEY = 'data/content.json';
 
 const DEFAULT_CONTENT = {
   site: {
@@ -26,18 +28,36 @@ const DEFAULT_CONTENT = {
 
 async function getContent() {
   try {
-    const { blob } = await head('data/content.json');
-    const res = await fetch(blob.url);
+    // 用 list 查找文件是否存在，避免 head() 报错
+    const { blobs } = await list({ prefix: CONTENT_KEY });
+    if (blobs.length === 0) {
+      // 不存在，写入默认内容
+      await put(CONTENT_KEY, JSON.stringify(DEFAULT_CONTENT, null, 2), {
+        access: 'public',
+        contentType: 'application/json',
+        addRandomSuffix: false,
+      });
+      return DEFAULT_CONTENT;
+    }
+    // 存在，读取最新内容
+    const latestBlob = blobs.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))[0];
+    const res = await fetch(latestBlob.url + '?t=' + Date.now());
     return await res.json();
-  } catch {
-    // First time: save defaults and return
-    await put('data/content.json', JSON.stringify(DEFAULT_CONTENT, null, 2), { access: 'public' });
+  } catch (e) {
+    console.error('getContent error:', e.message);
     return DEFAULT_CONTENT;
   }
 }
 
+async function saveContent(content) {
+  await put(CONTENT_KEY, JSON.stringify(content, null, 2), {
+    access: 'public',
+    contentType: 'application/json',
+    addRandomSuffix: false,
+  });
+}
+
 export default async function handler(req, res) {
-  // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -47,26 +67,33 @@ export default async function handler(req, res) {
   if (req.method === 'GET') {
     try {
       const content = await getContent();
+      // 不缓存，每次都取最新
+      res.setHeader('Cache-Control', 'no-store');
       return res.status(200).json(content);
     } catch (e) {
-      console.error('GET error:', e);
+      console.error('GET error:', e.message);
       return res.status(500).json({ error: 'Failed to load content' });
     }
   }
 
   if (req.method === 'POST') {
     try {
-      const { password, ...content } = req.body || {};
+      const body = req.body || {};
+      const { password, ...content } = body;
+
+      if (!process.env.ADMIN_PASSWORD) {
+        return res.status(500).json({ error: 'ADMIN_PASSWORD not configured on server' });
+      }
 
       if (password !== process.env.ADMIN_PASSWORD) {
         return res.status(401).json({ error: '密码错误' });
       }
 
-      await put('data/content.json', JSON.stringify(content, null, 2), { access: 'public' });
+      await saveContent(content);
       return res.status(200).json({ success: true, message: '保存成功' });
     } catch (e) {
-      console.error('POST error:', e);
-      return res.status(500).json({ error: 'Failed to save content' });
+      console.error('POST error:', e.message);
+      return res.status(500).json({ error: e.message || 'Failed to save content' });
     }
   }
 
