@@ -32,6 +32,11 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: '缺少文件名或数据' });
     }
 
+    // 检查 BLOB token
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      return res.status(500).json({ error: 'BLOB_READ_WRITE_TOKEN 环境变量未配置' });
+    }
+
     // base64 → Buffer
     const base64Data = data.includes(',') ? data.split(',')[1] : data;
     const buffer = Buffer.from(base64Data, 'base64');
@@ -40,14 +45,17 @@ export default async function handler(req, res) {
     const key = `images/${Date.now()}-${safeName}`;
     const type = contentType || 'image/jpeg';
 
+    // 显式传入 token，避免自动检测失败
     const blob = await put(key, buffer, {
       access: 'public',
       contentType: type,
+      token: process.env.BLOB_READ_WRITE_TOKEN,
     });
 
     return res.status(200).json({ url: blob.url, key });
   } catch (e) {
-    console.error('Upload error:', e.message, e.stack);
-    return res.status(500).json({ error: e.message || 'Upload failed' });
+    console.error('Upload error:', e.message);
+    console.error('Stack:', e.stack);
+    return res.status(500).json({ error: e.message || '上传失败，请检查 Blob 存储配置' });
   }
 }

@@ -1,6 +1,7 @@
 import { put, list } from '@vercel/blob';
 
 const CONTENT_KEY = 'data/content.json';
+const BLOB_TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 
 const DEFAULT_CONTENT = {
   site: {
@@ -28,14 +29,17 @@ const DEFAULT_CONTENT = {
 
 async function getContent() {
   try {
+    if (!BLOB_TOKEN) return DEFAULT_CONTENT;
+
     // 用 list 查找文件是否存在，避免 head() 报错
-    const { blobs } = await list({ prefix: CONTENT_KEY });
+    const { blobs } = await list({ prefix: CONTENT_KEY, token: BLOB_TOKEN });
     if (blobs.length === 0) {
       // 不存在，写入默认内容
       await put(CONTENT_KEY, JSON.stringify(DEFAULT_CONTENT, null, 2), {
         access: 'public',
         contentType: 'application/json',
         addRandomSuffix: false,
+        token: BLOB_TOKEN,
       });
       return DEFAULT_CONTENT;
     }
@@ -50,10 +54,13 @@ async function getContent() {
 }
 
 async function saveContent(content) {
+  if (!BLOB_TOKEN) throw new Error('BLOB_READ_WRITE_TOKEN not configured');
+
   await put(CONTENT_KEY, JSON.stringify(content, null, 2), {
     access: 'public',
     contentType: 'application/json',
     addRandomSuffix: false,
+    token: BLOB_TOKEN,
   });
 }
 
